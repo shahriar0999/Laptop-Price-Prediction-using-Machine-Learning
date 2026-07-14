@@ -9,6 +9,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      DAGSHUB_PAT: ${{ secrets.DAGSHUB_PAT }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
