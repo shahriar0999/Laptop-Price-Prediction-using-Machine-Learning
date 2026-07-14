@@ -170,7 +170,10 @@ def run():
             }
         )
         mlflow.sklearn.log_model(
-            sk_model=pipeline, artifact_path="model", input_example=X_train.head(5)
+            sk_model=pipeline,
+            artifact_path="model",
+            input_example=X_train.head(5),
+            serialization_format="cloudpickle",
         )
         logger.success("Successfully save the model artifact")
         logger.success(f"MLflow run logged  →  {run.info.run_id}")
