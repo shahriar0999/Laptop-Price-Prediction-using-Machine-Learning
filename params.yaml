@@ -1,0 +1,59 @@
+# =============================================================
+#  params.yaml — Single source of truth for the entire pipeline
+#  DVC reads this file to detect when a stage needs to re-run.
+#  All scripts import from this file via src/utils/config.py
+# =============================================================
+
+project:
+  name: Laptop Price Prediction
+  random_state: 39
+  target_col: Price
+  target_transform: log2        # applied before training
+
+data:
+  raw_path: data/raw/laptop_clean_dataset.csv
+  processed_dir: data/processed
+  train_file: data/processed/train.csv
+  test_file: data/processed/test.csv
+  test_size: 0.20
+
+preprocessor:
+  rare_category_threshold: 10
+  iqr_multiplier: 1.500001
+  display_categories: ["HD", "Full HD", "Quad HD", "4K"]
+  categorical_cols:
+    display:    [display_type]
+    company:    [Company]
+    typename:   [TypeName]
+    proc_brand: [processor_brand]
+    proc_type:  [processor_type]
+    os:         [os]
+  numerical_cols:
+    continuous: [Inches, Weight, processor_speed]
+    storage:    [ssd_storage, hdd_storage, flash_storage]
+    ram:        [ram]
+
+# ── Best params found from hyperparameter tuning ─────────────
+# Update these after each tuning run — used in train.py
+model:
+  name: GradientBoostingRegressor
+  best_params:
+    n_estimators:      508
+    learning_rate:     0.11180334141225859
+    max_depth:         3
+    subsample:         0.974723861567489
+    min_samples_leaf:  4
+    min_samples_split: 17
+    max_features:      null       # null = None in Python
+
+
+# ── MLflow / DagsHub ─────────────────────────────────────────
+mlflow:
+  dagshub_owner:    shahriar0999
+  dagshub_repo:     Laptop-Price-Prediction-using-Machine-Learning
+  tracking_uri:     "https://dagshub.com/shahriar0999/Laptop-Price-Prediction-using-Machine-Learning.mlflow"
+  experiment_train:  "LaptopPriceFinalTraining"
+
+# ── Evaluation thresholds ─────────────────────────────────────
+evaluate:
+  min_r2_threshold: 0.85     # pipeline fails if R² drops below this

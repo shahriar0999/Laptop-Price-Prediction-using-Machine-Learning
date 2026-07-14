@@ -1,0 +1,161 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python src/data/data_ingestion.py
+    deps:
+    - path: src/data/data_ingestion.py
+      hash: md5
+      md5: 06092bd8ee94c0a58bf0175c13edc4dc
+      size: 2325
+    - path: src/utils/
+      hash: md5
+      md5: 4a4c5df26c437a7c5e5f5259b38b68ee.dir
+      size: 43733
+      nfiles: 15
+    params:
+      params.yaml:
+        data.raw_path: data/raw/laptop_clean_dataset.csv
+        project.target_col: Price
+  data_split:
+    cmd: python src/data/data_split.py
+    deps:
+    - path: data/raw/laptop_clean_dataset.csv
+      hash: md5
+      md5: 4f664b6ab6bbdc1191c67571d38a0be4
+      size: 117516
+    - path: src/data/data_split.py
+      hash: md5
+      md5: 599526a3d203a2bdeffc01d3e4c55da7
+      size: 2914
+    - path: src/utils/
+      hash: md5
+      md5: 4a4c5df26c437a7c5e5f5259b38b68ee.dir
+      size: 43733
+      nfiles: 15
+    params:
+      params.yaml:
+        data.test_size: 0.2
+        project.random_state: 39
+        project.target_col: Price
+        project.target_transform: log2
+    outs:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: ef2f4d428dc83d8e02ba248df50423fc
+      size: 26263
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 0e8ada6aa96264f5ba6bb05df4add120
+      size: 104449
+  train:
+    cmd: python src/models/train.py
+    deps:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: ef2f4d428dc83d8e02ba248df50423fc
+      size: 26263
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 0e8ada6aa96264f5ba6bb05df4add120
+      size: 104449
+    - path: src/models/train.py
+      hash: md5
+      md5: cddb6782431a75f2023318412aa3649f
+      size: 7570
+    - path: src/utils/
+      hash: md5
+      md5: 4a4c5df26c437a7c5e5f5259b38b68ee.dir
+      size: 43733
+      nfiles: 15
+    params:
+      params.yaml:
+        mlflow:
+          dagshub_owner: shahriar0999
+          dagshub_repo: Laptop-Price-Prediction-using-Machine-Learning
+          tracking_uri: 
+            https://dagshub.com/shahriar0999/Laptop-Price-Prediction-using-Machine-Learning.mlflow
+          experiment_train: LaptopPriceFinalTraining
+        model:
+          name: GradientBoostingRegressor
+          best_params:
+            n_estimators: 508
+            learning_rate: 0.11180334141225859
+            max_depth: 3
+            subsample: 0.974723861567489
+            min_samples_leaf: 4
+            min_samples_split: 17
+            max_features:
+        preprocessor:
+          rare_category_threshold: 10
+          iqr_multiplier: 1.500001
+          display_categories:
+          - HD
+          - Full HD
+          - Quad HD
+          - 4K
+          categorical_cols:
+            display:
+            - display_type
+            company:
+            - Company
+            typename:
+            - TypeName
+            proc_brand:
+            - processor_brand
+            proc_type:
+            - processor_type
+            os:
+            - os
+          numerical_cols:
+            continuous:
+            - Inches
+            - Weight
+            - processor_speed
+            storage:
+            - ssd_storage
+            - hdd_storage
+            - flash_storage
+            ram:
+            - ram
+        project.random_state: 39
+        project.target_transform: log2
+    outs:
+    - path: reports/train_metrics.json
+      hash: md5
+      md5: 7f7c9389cf765f81547a3486ce7129ad
+      size: 217
+  evaluate:
+    cmd: python src/models/evaluate.py
+    deps:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: ef2f4d428dc83d8e02ba248df50423fc
+      size: 26263
+    - path: reports/train_metrics.json
+      hash: md5
+      md5: 7f7c9389cf765f81547a3486ce7129ad
+      size: 217
+    - path: src/models/evaluate.py
+      hash: md5
+      md5: f999f5bdf66082349516c127cc648c66
+      size: 4951
+    - path: src/utils/
+      hash: md5
+      md5: 4a4c5df26c437a7c5e5f5259b38b68ee.dir
+      size: 43733
+      nfiles: 15
+    params:
+      params.yaml:
+        evaluate.min_r2_threshold: 0.85
+        mlflow:
+          dagshub_owner: shahriar0999
+          dagshub_repo: Laptop-Price-Prediction-using-Machine-Learning
+          tracking_uri: 
+            https://dagshub.com/shahriar0999/Laptop-Price-Prediction-using-Machine-Learning.mlflow
+          experiment_train: LaptopPriceFinalTraining
+        project.target_transform: log2
+    outs:
+    - path: reports/evaluation_report.json
+      hash: md5
+      md5: e463521dcb6eb49fdab31b19a6adc788
+      size: 581

@@ -1,0 +1,85 @@
+# =============================================================
+#  dvc.yaml — Pipeline DAG
+#  Run full pipeline : dvc repro
+#  Run single stage  : dvc repro <stage_name>
+#  Visualise DAG     : dvc dag
+# =============================================================
+
+stages:
+
+  # ── STAGE 1: ingest raw data ─────────────────────────────────
+  data_ingestion:
+    cmd: python src/data/data_ingestion.py
+    deps:
+      - src/data/data_ingestion.py
+      - src/utils/
+    params:
+      - params.yaml:
+          - data.raw_path
+          - project.target_col
+
+
+  # ── STAGE 2: split into train / test ────────────────────────
+  data_split:
+    cmd: python src/data/data_split.py
+    deps:
+      - src/data/data_split.py
+      - src/utils/
+      - data/raw/laptop_clean_dataset.csv
+    params:
+      - params.yaml:
+          - data.test_size
+          - project.random_state
+          - project.target_col
+          - project.target_transform
+    outs:
+      - data/processed/train.csv:
+          cache: true
+      - data/processed/test.csv:
+          cache: true
+
+  # ── STAGE 3: train final model with best params ──────────────
+  train:
+    cmd: python src/models/train.py
+    deps:
+      - src/models/train.py
+      - src/utils/
+      - data/processed/train.csv
+      - data/processed/test.csv
+    params:
+      - params.yaml:
+          - model
+          - preprocessor
+          - project.random_state
+          - project.target_transform
+          - mlflow
+    outs:
+      - reports/train_metrics.json:
+          cache: false
+
+  # ── STAGE 5: evaluate on held-out test set ───────────────────
+  evaluate:
+    cmd: python src/models/evaluate.py
+    deps:
+      - src/models/evaluate.py
+      - src/utils/
+      - data/processed/test.csv
+      - reports/train_metrics.json
+    params:
+      - params.yaml:
+          - evaluate.min_r2_threshold
+          - project.target_transform
+          - mlflow
+    outs:
+      - reports/evaluation_report.json:
+          cache: false
+
+metrics:
+  - reports/train_metrics.json
+  - reports/evaluation_report.json
+
+plots:
+  - reports/tuning_results.csv:
+      x: rank
+      y: r2_log
+      title: "Tuning — R² by candidate rank"
