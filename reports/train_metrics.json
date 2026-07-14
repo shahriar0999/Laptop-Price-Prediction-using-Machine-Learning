@@ -1,0 +1,11 @@
+{
+  "r2_log": 0.8806,
+  "rmse_log": 0.291,
+  "mae_log": 0.2151,
+  "r2_orig": 0.8001,
+  "rmse_orig": 15797.48,
+  "mae_orig": 9886.32,
+  "cv_r2_mean": 0.8801,
+  "cv_r2_std": 0.0123,
+  "train_time_sec": 3.528
+}

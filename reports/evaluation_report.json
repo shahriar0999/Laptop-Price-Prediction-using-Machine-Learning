@@ -1,0 +1,24 @@
+{
+  "r2_log": 0.8806,
+  "rmse_log": 0.291,
+  "mae_log": 0.2151,
+  "r2_orig": 0.8001,
+  "rmse_orig": 15797.48,
+  "mae_orig": 9886.32,
+  "cv_r2_mean": 0.8801,
+  "cv_r2_std": 0.0123,
+  "train_time_sec": 3.528,
+  "overfit_gap": 0.0005,
+  "min_r2_threshold": 0.85,
+  "threshold_status": "PASS",
+  "model": "GradientBoostingRegressor",
+  "best_params": {
+    "n_estimators": 508,
+    "learning_rate": 0.11180334141225859,
+    "max_depth": 3,
+    "subsample": 0.974723861567489,
+    "min_samples_leaf": 4,
+    "min_samples_split": 17,
+    "max_features": null
+  }
+}
