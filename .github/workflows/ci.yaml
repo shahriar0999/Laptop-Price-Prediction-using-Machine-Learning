@@ -33,3 +33,16 @@ jobs:
         run: |
           black . --check
       
+      - name: Run DVC Pipeline 
+        run: |
+          dvc repro
+      
+      - name: Validate Model Performance
+        run: |
+          python scripts/check_metrics.py
+
+      - name: Build Docker Image
+        run: |
+          docker build -t laptop-price-prediction .
+
+      
