@@ -1,0 +1,22 @@
+# auto_mix_prep==0.2.0
+# fastapi==0.138.0
+# mlflow==3.14.0
+# mlflow_skinny==3.14.0
+# mlflow_tracing==3.14.0
+# pandas==3.0.3
+# pydantic==2.13.4
+# python-dotenv==1.2.2
+# PyYAML
+
+auto_mix_prep
+pandas
+fastapi
+mlflow
+mlflow_skinny
+mlflow_tracing
+pydantic
+python-dotenv
+PyYAML
+scikit-learn
+uvicorn[standard]
+requests
