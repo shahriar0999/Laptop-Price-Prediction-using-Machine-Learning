@@ -30,17 +30,17 @@ STAGE = "STAGE 2 · DATA SPLIT"
 def run():
     logger.step(STAGE)
 
-    data_cfg    = get_data_cfg()
+    data_cfg = get_data_cfg()
     project_cfg = get_project_cfg()
 
-    raw_path       = ROOT / data_cfg["raw_path"]
-    processed_dir  = ROOT / data_cfg["processed_dir"]
+    raw_path = ROOT / data_cfg["raw_path"]
+    processed_dir = ROOT / data_cfg["processed_dir"]
     processed_dir.mkdir(parents=True, exist_ok=True)
 
-    target     = project_cfg["target_col"]
-    transform  = project_cfg["target_transform"]
-    test_size  = data_cfg["test_size"]
-    seed       = project_cfg["random_state"]
+    target = project_cfg["target_col"]
+    transform = project_cfg["target_transform"]
+    test_size = data_cfg["test_size"]
+    seed = project_cfg["random_state"]
 
     # ── load ─────────────────────────────────────────────────────────
     logger.info(f"Loading  →  {raw_path}")
@@ -53,19 +53,20 @@ def run():
         df[target] = np.log2(df[target])
     elif transform == "log":
         df[target] = np.log(df[target])
-    logger.info(f"Transformed target  min={df[target].min():.3f}  "
-                f"max={df[target].max():.3f}  mean={df[target].mean():.3f}")
+    logger.info(
+        f"Transformed target  min={df[target].min():.3f}  "
+        f"max={df[target].max():.3f}  mean={df[target].mean():.3f}"
+    )
 
     # ── split ─────────────────────────────────────────────────────────
     logger.info(f"Splitting  test_size={test_size}  random_state={seed}")
-    train_df, test_df = train_test_split(df, test_size=test_size,
-                                         random_state=seed)
+    train_df, test_df = train_test_split(df, test_size=test_size, random_state=seed)
 
     train_path = ROOT / data_cfg["train_file"]
-    test_path  = ROOT / data_cfg["test_file"]
+    test_path = ROOT / data_cfg["test_file"]
 
     train_df.to_csv(train_path, index=False)
-    test_df.to_csv(test_path,  index=False)
+    test_df.to_csv(test_path, index=False)
 
     logger.success(f"Train  →  {train_df.shape[0]:,} rows  →  {train_path}")
     logger.success(f"Test   →  {test_df.shape[0]:,} rows  →  {test_path}")

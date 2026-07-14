@@ -9,31 +9,35 @@ DVC dependency : data/processed/test.csv, reports/train_metrics.json
 DVC output     : reports/evaluation_report.json
 """
 
-import sys, json
+import sys
+import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-import pandas as pd
 
-from src.utils.logger  import get_logger
-from src.utils.config  import (get_data_cfg, get_project_cfg,
-                                get_evaluate_cfg, get_model_cfg)
+from src.utils.logger import get_logger
+from src.utils.config import (
+    get_data_cfg,
+    get_project_cfg,
+    get_evaluate_cfg,
+    get_model_cfg,
+)
 
 logger = get_logger("stage_05_evaluate")
-STAGE  = "STAGE 5 · EVALUATION"
+STAGE = "STAGE 5 · EVALUATION"
 
 
 def run():
     logger.step(STAGE)
 
-    data_cfg  = get_data_cfg()
-    proj_cfg  = get_project_cfg()
-    eval_cfg  = get_evaluate_cfg()
+    get_data_cfg()
+    proj_cfg = get_project_cfg()
+    eval_cfg = get_evaluate_cfg()
     model_cfg = get_model_cfg()
 
-    reports   = ROOT / "reports"
+    reports = ROOT / "reports"
     reports.mkdir(parents=True, exist_ok=True)
 
     metrics_path = reports / "train_metrics.json"
@@ -43,14 +47,14 @@ def run():
     with open(metrics_path) as f:
         metrics = json.load(f)
 
-    r2_log    = metrics["r2_log"]
-    rmse_log  = metrics["rmse_log"]
-    mae_log   = metrics["mae_log"]
-    r2_orig   = metrics["r2_orig"]
+    r2_log = metrics["r2_log"]
+    rmse_log = metrics["rmse_log"]
+    mae_log = metrics["mae_log"]
+    r2_orig = metrics["r2_orig"]
     rmse_orig = metrics["rmse_orig"]
-    mae_orig  = metrics["mae_orig"]
-    cv_mean   = metrics["cv_r2_mean"]
-    cv_std    = metrics["cv_r2_std"]
+    mae_orig = metrics["mae_orig"]
+    cv_mean = metrics["cv_r2_mean"]
+    cv_std = metrics["cv_r2_std"]
 
     # ── terminal report ──────────────────────────────────────────────
     logger.info("─" * 55)
@@ -67,8 +71,10 @@ def run():
     logger.info("  ── Cross-validation (5-fold) ─────────────────────")
     logger.info(f"  CV R²          : {cv_mean} ± {cv_std}")
     overfit = round(r2_log - cv_mean, 4)
-    logger.info(f"  Overfit gap    : {overfit}  "
-                f"{'⚠ possible overfit' if overfit > 0.05 else '✔ within acceptable range'}")
+    logger.info(
+        f"  Overfit gap    : {overfit}  "
+        f"{'⚠ possible overfit' if overfit > 0.05 else '✔ within acceptable range'}"
+    )
     logger.info("─" * 55)
 
     # ── best params reminder ─────────────────────────────────────────
@@ -92,11 +98,11 @@ def run():
     # ── save evaluation report ───────────────────────────────────────
     report = {
         **metrics,
-        "overfit_gap":      overfit,
+        "overfit_gap": overfit,
         "min_r2_threshold": threshold,
         "threshold_status": status,
-        "model":            model_cfg["name"],
-        "best_params":      model_cfg["best_params"],
+        "model": model_cfg["name"],
+        "best_params": model_cfg["best_params"],
     }
     out_path = reports / "evaluation_report.json"
     with open(out_path, "w") as f:

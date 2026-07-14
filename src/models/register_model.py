@@ -48,6 +48,7 @@ file.setFormatter(fmt)
 logger.addHandler(console)
 logger.addHandler(file)
 
+
 # ─────────────────────────────────────────────
 # Load model info from training
 # ─────────────────────────────────────────────
@@ -60,6 +61,7 @@ def load_model_info(path: str):
     except Exception as e:
         logger.error(f"Error loading model info: {e}")
         raise
+
 
 # ─────────────────────────────────────────────
 # Register model (MLflow 1.27 compatible)
@@ -85,12 +87,10 @@ def register_model(model_name: str, model_info: dict):
             name=model_name,
             version=mv.version,
             stage="Staging",
-            archive_existing_versions=False
+            archive_existing_versions=False,
         )
 
-        logger.info(
-            f"Model {model_name} v{mv.version} moved to Staging"
-        )
+        logger.info(f"Model {model_name} v{mv.version} moved to Staging")
 
         return mv.version
 

@@ -22,9 +22,11 @@ logger = get_logger("fastapi_app")
 # ── 1. Load params.yaml (same as your script) ────────────────────────
 PARAMS_PATH = ROOT / "params.yaml"
 
+
 def load_params(path: Path) -> dict:
     with open(path, "r") as f:
         return yaml.safe_load(f)
+
 
 params = load_params(PARAMS_PATH)
 
@@ -37,7 +39,7 @@ os.environ["MLFLOW_TRACKING_USERNAME"] = token
 os.environ["MLFLOW_TRACKING_PASSWORD"] = token
 
 # ── 3. MLflow config straight from params ────────────────────────────
-TRACKING_URI    = params["mlflow"]["tracking_uri"]
+TRACKING_URI = params["mlflow"]["tracking_uri"]
 EXPERIMENT_NAME = params["mlflow"]["experiment_train"]
 
 mlflow.set_tracking_uri(TRACKING_URI)
@@ -58,9 +60,7 @@ def load_latest_model():
             "Check params.yaml → mlflow.experiment_train"
         )
 
-    runs = mlflow.search_runs(
-        experiment_ids=[experiment.experiment_id]
-    )
+    runs = mlflow.search_runs(experiment_ids=[experiment.experiment_id])
     if runs.empty:
         raise RuntimeError(
             f"No runs found in experiment '{EXPERIMENT_NAME}'. "
@@ -69,7 +69,7 @@ def load_latest_model():
 
     # Latest run by start_time — same as your script
     best_run = runs.sort_values("start_time", ascending=False).iloc[0]
-    run_id   = best_run.run_id
+    run_id = best_run.run_id
     model_uri = f"runs:/{run_id}/model"
 
     logger.info(f"Latest run_id : {run_id}")
@@ -82,9 +82,9 @@ def load_latest_model():
 
 # ── 5. Global model holder ────────────────────────────────────────────
 class ModelHolder:
-    model     = None
+    model = None
     model_uri = ""
-    run_id    = ""
+    run_id = ""
 
 
 # ── 6. Lifespan: load once at startup ────────────────────────────────
@@ -96,7 +96,9 @@ async def lifespan(app: FastAPI):
     logger.info(f"  Experiment   : {EXPERIMENT_NAME}")
     logger.info("=" * 55)
     try:
-        ModelHolder.model, ModelHolder.model_uri, ModelHolder.run_id = load_latest_model()
+        ModelHolder.model, ModelHolder.model_uri, ModelHolder.run_id = (
+            load_latest_model()
+        )
     except Exception as exc:
         logger.error(f"Startup failed — could not load model: {exc}")
         raise
@@ -125,53 +127,67 @@ app.add_middleware(
 
 # ── 8. Request / Response schemas ─────────────────────────────────────
 class LaptopFeatures(BaseModel):
-    Company:         str   = Field(..., example="Dell")
-    TypeName:        str   = Field(..., example="Notebook")
-    Inches:          float = Field(..., example=15.6)
-    display_type:    str   = Field(..., example="Full HD",
-                                   description="HD | Full HD | Quad HD | 4K")
-    ram:             int   = Field(..., example=8,   description="RAM in GB")
-    Weight:          float = Field(..., example=2.0, description="Weight in kg")
-    processor_brand: str   = Field(..., example="Intel")
-    processor_type:  str   = Field(..., example="Core i5")
+    Company: str = Field(..., example="Dell")
+    TypeName: str = Field(..., example="Notebook")
+    Inches: float = Field(..., example=15.6)
+    display_type: str = Field(
+        ..., example="Full HD", description="HD | Full HD | Quad HD | 4K"
+    )
+    ram: int = Field(..., example=8, description="RAM in GB")
+    Weight: float = Field(..., example=2.0, description="Weight in kg")
+    processor_brand: str = Field(..., example="Intel")
+    processor_type: str = Field(..., example="Core i5")
     processor_speed: float = Field(..., example=2.5, description="GHz")
-    ssd_storage:     int   = Field(0,   example=256, description="SSD in GB")
-    hdd_storage:     int   = Field(0,   example=0,   description="HDD in GB")
-    flash_storage:   int   = Field(0,   example=0,   description="Flash in GB")
-    os:              str   = Field(..., example="Windows")
+    ssd_storage: int = Field(0, example=256, description="SSD in GB")
+    hdd_storage: int = Field(0, example=0, description="HDD in GB")
+    flash_storage: int = Field(0, example=0, description="Flash in GB")
+    os: str = Field(..., example="Windows")
 
-    model_config = {"json_schema_extra": {"example": {
-        "Company": "Dell", "TypeName": "Notebook", "Inches": 15.6,
-        "display_type": "Full HD", "ram": 8, "Weight": 2.0,
-        "processor_brand": "Intel", "processor_type": "Core i5",
-        "processor_speed": 2.5, "ssd_storage": 256,
-        "hdd_storage": 0, "flash_storage": 0, "os": "Windows",
-    }}}
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "Company": "Dell",
+                "TypeName": "Notebook",
+                "Inches": 15.6,
+                "display_type": "Full HD",
+                "ram": 8,
+                "Weight": 2.0,
+                "processor_brand": "Intel",
+                "processor_type": "Core i5",
+                "processor_speed": 2.5,
+                "ssd_storage": 256,
+                "hdd_storage": 0,
+                "flash_storage": 0,
+                "os": "Windows",
+            }
+        }
+    }
 
 
 class PredictionResponse(BaseModel):
     predicted_price_inr: float
-    run_id:              str
-    model_uri:           str
-    status:              str = "success"
+    run_id: str
+    model_uri: str
+    status: str = "success"
 
 
 class HealthResponse(BaseModel):
-    status:       str
-    run_id:       str
-    model_uri:    str
+    status: str
+    run_id: str
+    model_uri: str
     model_loaded: bool
 
 
 # ── 9. Routes ─────────────────────────────────────────────────────────
 
+
 @app.get("/", tags=["Root"])
 def root():
     return {
-        "message":    "Laptop Price Prediction API",
-        "docs":       "/docs",
-        "health":     "/health",
-        "predict":    "/predict  (POST)",
+        "message": "Laptop Price Prediction API",
+        "docs": "/docs",
+        "health": "/health",
+        "predict": "/predict  (POST)",
         "model_info": "/model-info",
     }
 
@@ -196,7 +212,7 @@ def predict(features: LaptopFeatures):
     try:
         # Pipeline predicts log2(Price) → reverse with 2^x → actual ₹
         log2_price = ModelHolder.model.predict(input_df)[0]
-        price_inr  = round(2 ** float(log2_price), 2)
+        price_inr = round(2 ** float(log2_price), 2)
     except Exception as exc:
         logger.error(f"Prediction error: {exc}")
         raise HTTPException(status_code=500, detail=f"Prediction failed: {exc}")
@@ -216,10 +232,10 @@ def model_info():
     if ModelHolder.model is None:
         raise HTTPException(status_code=503, detail="Model not loaded.")
     return {
-        "run_id":          ModelHolder.run_id,
-        "model_uri":       ModelHolder.model_uri,
-        "experiment":      EXPERIMENT_NAME,
-        "tracking_uri":    TRACKING_URI,
-        "pipeline_steps":  [s[0] for s in ModelHolder.model.steps],
+        "run_id": ModelHolder.run_id,
+        "model_uri": ModelHolder.model_uri,
+        "experiment": EXPERIMENT_NAME,
+        "tracking_uri": TRACKING_URI,
+        "pipeline_steps": [s[0] for s in ModelHolder.model.steps],
         "final_estimator": type(ModelHolder.model.steps[-1][1]).__name__,
     }

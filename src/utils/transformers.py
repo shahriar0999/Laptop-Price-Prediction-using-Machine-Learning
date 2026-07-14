@@ -20,9 +20,7 @@ class RareCategoryGrouper(BaseEstimator, TransformerMixin):
         X = pd.DataFrame(X)
         for col in X.columns:
             counts = X[col].value_counts()
-            self.frequent_categories_[col] = set(
-                counts[counts >= self.threshold].index
-            )
+            self.frequent_categories_[col] = set(counts[counts >= self.threshold].index)
         return self
 
     def transform(self, X, y=None):
@@ -42,12 +40,12 @@ class OSStandardiser(BaseEstimator, TransformerMixin):
     """Normalises OS label variants → canonical names."""
 
     OS_MAP = {
-        "macos":   "macOS",
-        "mac":     "macOS",
+        "macos": "macOS",
+        "mac": "macOS",
         "windows": "Windows",
-        "linux":   "Linux",
-        "chrome":  "Chrome OS",
-        "no":      "No OS",
+        "linux": "Linux",
+        "chrome": "Chrome OS",
+        "no": "No OS",
     }
 
     def fit(self, X, y=None):
@@ -57,7 +55,8 @@ class OSStandardiser(BaseEstimator, TransformerMixin):
         X = pd.DataFrame(X).copy()
         for col in X.columns:
             X[col] = (
-                X[col].astype(str)
+                X[col]
+                .astype(str)
                 .str.lower()
                 .str.strip()
                 .map(self.OS_MAP)
@@ -77,21 +76,45 @@ class ProcessorFamilyGrouper(BaseEstimator, TransformerMixin):
     @staticmethod
     def _group(proc: str) -> str:
         p = str(proc).lower()
-        if "core i9" in p: return "Core i9"
-        if "core i7" in p: return "Core i7"
-        if "core i5" in p: return "Core i5"
-        if "core i3" in p: return "Core i3"
-        if "core m"  in p: return "Core M"
-        if "ryzen"   in p: return "Ryzen"
-        if "xeon"    in p: return "Xeon"
-        if "celeron" in p: return "Celeron"
-        if "pentium" in p: return "Pentium"
-        if "atom"    in p: return "Atom"
-        if any(x in p for x in [
-            "a4-", "a6-", "a8-", "a9-", "a10-", "a12-",
-            "a4 ", "a6 ", "a8 ", "a9 ", "a10 ", "a12 ",
-            "fx ", "e-series",
-        ]):
+        if "core i9" in p:
+            return "Core i9"
+        if "core i7" in p:
+            return "Core i7"
+        if "core i5" in p:
+            return "Core i5"
+        if "core i3" in p:
+            return "Core i3"
+        if "core m" in p:
+            return "Core M"
+        if "ryzen" in p:
+            return "Ryzen"
+        if "xeon" in p:
+            return "Xeon"
+        if "celeron" in p:
+            return "Celeron"
+        if "pentium" in p:
+            return "Pentium"
+        if "atom" in p:
+            return "Atom"
+        if any(
+            x in p
+            for x in [
+                "a4-",
+                "a6-",
+                "a8-",
+                "a9-",
+                "a10-",
+                "a12-",
+                "a4 ",
+                "a6 ",
+                "a8 ",
+                "a9 ",
+                "a10 ",
+                "a12 ",
+                "fx ",
+                "e-series",
+            ]
+        ):
             return "AMD Other"
         return "Other"
 

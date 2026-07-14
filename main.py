@@ -1,19 +1,20 @@
-import json
 import yaml
 import mlflow
 
 PARAMS_PATH = "params.yaml"
 
-def load_params(path) :
+
+def load_params(path):
     with open(path, "r") as f:
         return yaml.safe_load(f)
+
 
 params = load_params(PARAMS_PATH)
 
 
-mlflow.set_tracking_uri(params['mlflow']['tracking_uri'])
+mlflow.set_tracking_uri(params["mlflow"]["tracking_uri"])
 
-experiment_name = params['mlflow']['experiment_train']
+experiment_name = params["mlflow"]["experiment_train"]
 
 experiment = mlflow.get_experiment_by_name(experiment_name)
 

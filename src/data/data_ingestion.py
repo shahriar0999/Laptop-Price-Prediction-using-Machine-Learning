@@ -27,7 +27,7 @@ STAGE = "STAGE 1 · DATA INGESTION"
 def run():
     logger.step(STAGE)
 
-    data_cfg    = get_data_cfg()
+    data_cfg = get_data_cfg()
     project_cfg = get_project_cfg()
 
     raw_path = ROOT / data_cfg["raw_path"]
@@ -50,10 +50,12 @@ def run():
     else:
         logger.info("No column has >50% missing values  ✓")
 
-    logger.info(f"Target stats — "
-                f"min={df[target].min():.0f}  "
-                f"max={df[target].max():.0f}  "
-                f"mean={df[target].mean():.0f}")
+    logger.info(
+        f"Target stats — "
+        f"min={df[target].min():.0f}  "
+        f"max={df[target].max():.0f}  "
+        f"mean={df[target].mean():.0f}"
+    )
 
     logger.success(f"{STAGE} COMPLETE — {raw_path}")
 
